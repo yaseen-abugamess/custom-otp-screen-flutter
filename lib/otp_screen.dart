@@ -79,12 +79,12 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   Widget pinNumber(TextEditingController editingController,
-      OutlineInputBorder outlineInputBorder) {
+      OutlineInputBorder outlineInputBorder, double size, double deviceSize) {
     return Container(
-      width: 55.0,
-      height: 60.0,
+      width: size - 2,
+      height: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(8.0),
         border:
             Border.all(color: _isPinCorrect ? Colors.transparent : Colors.red),
       ),
@@ -93,13 +93,13 @@ class _OtpScreenState extends State<OtpScreen> {
         controller: editingController,
         textAlign: TextAlign.center,
         decoration: InputDecoration(
-            contentPadding: const EdgeInsets.all(15.0),
+            contentPadding: const EdgeInsets.all(14.0),
             border: outlineInputBorder,
             filled: true,
             fillColor: Colors.grey.withOpacity(0.1)),
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          fontSize: 25.2,
+          fontSize: deviceSize > 736.0 ? 30.0 : 18.0,
         ),
       ),
     );
@@ -130,34 +130,53 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     forgetMethod = ModalRoute.of(context).settings.arguments as Map;
+    var deviceScreen = MediaQuery.of(context);
+    print(deviceScreen.size.height);
     return Column(
       children: <Widget>[
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: <Widget>[
-              Container(
-                alignment: Alignment.bottomCenter,
-                margin: const EdgeInsets.only(bottom: 20.0),
-                child: Text(
-                  'Enter Verification Code here',
-                  style: TextStyle(
-                    fontSize: 16.0,
+        Container(
+          height: deviceScreen.size.height * 0.35,
+          child: LayoutBuilder(
+            builder: (context, constrains) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  SizedBox(
+                    height: constrains.maxHeight * 0.1,
                   ),
-                ),
-              ),
-              buildPinRow(),
-              SizedBox(
-                height: 40.0,
-              ),
-              buildResendNumber(),
-              SizedBox(
-                height: 40.0,
-              ),
-            ],
+                  Container(
+                    height: constrains.maxHeight * 0.15,
+                    alignment: Alignment.bottomCenter,
+                    child: Text(
+                      'Enter Verification Code here',
+                      style: TextStyle(
+                        fontSize: deviceScreen.size.height > 736 ? 16.0 : 13.0,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: constrains.maxHeight * 0.10,
+                  ),
+                  Container(
+                    height: deviceScreen.size.height > 736
+                        ? constrains.maxHeight * 0.25
+                        : 60,
+                    child: buildPinRow(),
+                  ),
+                  SizedBox(
+                    height: constrains.maxHeight * 0.1,
+                  ),
+                  buildResendNumber(),
+                  SizedBox(
+                    height: constrains.maxHeight * 0.15,
+                  ),
+                ],
+              );
+            },
           ),
         ),
-        Expanded(child: buildNumberPad()),
+        Container(
+            height: deviceScreen.size.height * 0.5, child: buildNumberPad()),
       ],
     );
   }
@@ -166,33 +185,45 @@ class _OtpScreenState extends State<OtpScreen> {
     return Directionality(
       textDirection: TextDirection.ltr,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 50.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            pinNumber(
-              pinOneController,
-              outLineBorder,
-            ),
-            pinNumber(
-              pinTwoController,
-              outLineBorder,
-            ),
-            pinNumber(
-              pinThreeController,
-              outLineBorder,
-            ),
-            pinNumber(
-              pinFourController,
-              outLineBorder,
-            ),
-          ],
+        margin: const EdgeInsets.symmetric(horizontal: 40.0),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Container(
+              height: constraints.maxHeight * 0.8,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  pinNumber(
+                      pinOneController,
+                      outLineBorder,
+                      constraints.maxHeight * 0.8,
+                      MediaQuery.of(context).size.height),
+                  pinNumber(
+                      pinTwoController,
+                      outLineBorder,
+                      constraints.maxHeight * 0.8,
+                      MediaQuery.of(context).size.height),
+                  pinNumber(
+                      pinThreeController,
+                      outLineBorder,
+                      constraints.maxHeight * 0.8,
+                      MediaQuery.of(context).size.height),
+                  pinNumber(
+                      pinFourController,
+                      outLineBorder,
+                      constraints.maxHeight * 0.8,
+                      MediaQuery.of(context).size.height),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
   buildResendNumber() {
+    var deviceSize = MediaQuery.of(context);
     return _timerFinished
         ? Container(
             child: Row(
@@ -201,7 +232,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 Text(
                   'Don\'t Recive code? ',
                   style: TextStyle(
-                    fontSize: 16.0,
+                    fontSize: deviceSize.size.height > 736 ? 16.0 : 13.0,
                   ),
                 ),
                 GestureDetector(
@@ -212,7 +243,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     'Resend',
                     style: TextStyle(
                       color: Theme.of(context).accentColor,
-                      fontSize: 16.0,
+                      fontSize: deviceSize.size.height > 736 ? 16.0 : 13.0,
                     ),
                   ),
                 ),
@@ -221,12 +252,12 @@ class _OtpScreenState extends State<OtpScreen> {
           )
         : Container(
             width: 120.0,
-            height: 30.0,
+            height: 15.0,
             alignment: Alignment.center,
             child: Text(
               '00:$_start',
               style: TextStyle(
-                  fontSize: 25.0,
+                  fontSize: deviceSize.size.height > 736 ? 16.0 : 13.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.red),
             ),
@@ -236,105 +267,137 @@ class _OtpScreenState extends State<OtpScreen> {
   buildNumberPad() {
     return Container(
       alignment: Alignment.bottomCenter,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 30.0),
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  KeyBoardNumber(
-                      n: 1,
-                      onPressed: () {
-                        pinIndexSetup("1");
-                      }),
-                  KeyBoardNumber(
-                      n: 2,
-                      onPressed: () {
-                        pinIndexSetup("2");
-                      }),
-                  KeyBoardNumber(
-                      n: 3,
-                      onPressed: () {
-                        pinIndexSetup("3");
-                      }),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  KeyBoardNumber(
-                      n: 4,
-                      onPressed: () {
-                        pinIndexSetup("4");
-                      }),
-                  KeyBoardNumber(
-                      n: 5,
-                      onPressed: () {
-                        pinIndexSetup("5");
-                      }),
-                  KeyBoardNumber(
-                      n: 6,
-                      onPressed: () {
-                        pinIndexSetup("6");
-                      }),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  KeyBoardNumber(
-                      n: 7,
-                      onPressed: () {
-                        pinIndexSetup("7");
-                      }),
-                  KeyBoardNumber(
-                      n: 8,
-                      onPressed: () {
-                        pinIndexSetup("8");
-                      }),
-                  KeyBoardNumber(
-                      n: 9,
-                      onPressed: () {
-                        pinIndexSetup("9");
-                      }),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Container(
-                    width: 70.0,
-                    height: 70.0,
-                    child: MaterialButton(onPressed: null),
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: LayoutBuilder(
+          builder: (context, constraint) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Container(
+                  height: constraint.maxHeight * 0.2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      KeyBoardNumber(
+                        n: 1,
+                        onPressed: () {
+                          pinIndexSetup("1");
+                        },
+                        size: constraint.maxHeight * 0.2,
+                      ),
+                      KeyBoardNumber(
+                          n: 2,
+                          onPressed: () {
+                            pinIndexSetup("2");
+                          },
+                          size: constraint.maxHeight * 0.2),
+                      KeyBoardNumber(
+                          n: 3,
+                          onPressed: () {
+                            pinIndexSetup("3");
+                          },
+                          size: constraint.maxHeight * 0.2),
+                    ],
                   ),
-                  KeyBoardNumber(
-                      n: 0,
-                      onPressed: () {
-                        pinIndexSetup("0");
-                      }),
-                  Container(
-                    width: 70.0,
-                    height: 70.0,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.grey.withOpacity(0.2)),
-                    child: MaterialButton(
-                      onPressed: () {
-                        clearPin();
-                      },
-                      child: Icon(Icons.clear),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(70.0)),
-                    ),
+                ),
+                Container(
+                  height: constraint.maxHeight * 0.2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      KeyBoardNumber(
+                          n: 4,
+                          onPressed: () {
+                            pinIndexSetup("4");
+                          },
+                          size: constraint.maxHeight * 0.2),
+                      KeyBoardNumber(
+                          n: 5,
+                          onPressed: () {
+                            pinIndexSetup("5");
+                          },
+                          size: constraint.maxHeight * 0.2),
+                      KeyBoardNumber(
+                          n: 6,
+                          onPressed: () {
+                            pinIndexSetup("6");
+                          },
+                          size: constraint.maxHeight * 0.2),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+                Container(
+                  height: constraint.maxHeight * 0.2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      KeyBoardNumber(
+                          n: 7,
+                          onPressed: () {
+                            pinIndexSetup("7");
+                          },
+                          size: constraint.maxHeight * 0.2),
+                      KeyBoardNumber(
+                        n: 8,
+                        onPressed: () {
+                          pinIndexSetup("8");
+                        },
+                        size: constraint.maxHeight * 0.2,
+                      ),
+                      KeyBoardNumber(
+                          n: 9,
+                          onPressed: () {
+                            pinIndexSetup("9");
+                          },
+                          size: constraint.maxHeight * 0.2),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: constraint.maxHeight * 0.2,
+                  child: LayoutBuilder(
+                    builder: (context, constraint) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Container(
+                            width: constraint.maxHeight * 0.8,
+                            height: constraint.maxHeight * 0.8,
+                            child: MaterialButton(onPressed: null),
+                          ),
+                          KeyBoardNumber(
+                            n: 0,
+                            onPressed: () {
+                              pinIndexSetup("0");
+                            },
+                            size: constraint.maxHeight,
+                          ),
+                          Container(
+                            width: constraint.maxHeight * 0.9,
+                            height: constraint.maxHeight * 0.9,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.grey.withOpacity(0.2)),
+                            child: MaterialButton(
+                              onPressed: () {
+                                clearPin();
+                              },
+                              child: Icon(Icons.clear),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(constraint.maxHeight),
+                              ),
+                            ),
+                          )
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -398,26 +461,28 @@ class _OtpScreenState extends State<OtpScreen> {
 class KeyBoardNumber extends StatelessWidget {
   final int n;
   final Function onPressed;
-  KeyBoardNumber({this.n, this.onPressed});
+  final double size;
+  KeyBoardNumber({this.n, this.onPressed, this.size});
   @override
   Widget build(BuildContext context) {
+    var deviceSize = MediaQuery.of(context);
     return Container(
-      width: 70.0,
-      height: 70.0,
+      width: size * 0.9,
+      height: size * 0.9,
       decoration: BoxDecoration(
           shape: BoxShape.circle, color: Colors.grey.withOpacity(0.2)),
       alignment: Alignment.center,
       child: MaterialButton(
-        padding: const EdgeInsets.only(
-            left: 8.0, top: 10.0, right: 8.0, bottom: 4.0),
+        padding:
+            const EdgeInsets.only(left: 8.0, top: 8.0, right: 8.0, bottom: 8.0),
         onPressed: onPressed,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(70.0)),
-        height: 70.0,
+        height: size * 0.8,
         child: Text(
           "$n",
           style: TextStyle(
-              fontSize: 30 * MediaQuery.of(context).textScaleFactor,
+              fontSize: deviceSize.size.height > 736 ? 30.0 : 25.0,
               fontWeight: FontWeight.bold),
         ),
       ),
